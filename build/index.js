@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 // Read all files in directory /backup
 const node_fs_1 = require("node:fs");
+const path = '/backup';
 function getDate(name) {
     // nodebb-25-10-22.tar.gz
     const parts = name.split('-');
@@ -13,7 +14,7 @@ function getDate(name) {
     }
     return null;
 }
-const list = (0, node_fs_1.readdirSync)('/backup');
+const list = (0, node_fs_1.readdirSync)(path);
 const now = new Date();
 // delete all backups oder than 30 days
 for (const file of list) {
@@ -23,8 +24,7 @@ for (const file of list) {
         const days = diff / (1000 * 60 * 60 * 24);
         if (days > 30) {
             console.log(`Deleting backup file: ${file} (age: ${Math.floor(days)} days) (date: ${date.toISOString().split('T')[0]})`);
-            // uncomment the next line to actually delete the files
-            // fs.unlinkSync(`/backup/${file}`);
+            (0, node_fs_1.unlinkSync)(`${path}/${file}`);
         }
     }
 }

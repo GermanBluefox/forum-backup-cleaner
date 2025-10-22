@@ -1,5 +1,6 @@
 // Read all files in directory /backup
-import { readdirSync } from 'node:fs';
+import { readdirSync, unlinkSync } from 'node:fs';
+const path = '/backup';
 
 function getDate(name: string): Date | null {
     // nodebb-25-10-22.tar.gz
@@ -13,7 +14,7 @@ function getDate(name: string): Date | null {
     return null;
 }
 
-const list = readdirSync('/backup');
+const list = readdirSync(path);
 const now = new Date();
 // delete all backups oder than 30 days
 for (const file of list) {
@@ -23,8 +24,7 @@ for (const file of list) {
         const days = diff / (1000 * 60 * 60 * 24);
         if (days > 30) {
             console.log(`Deleting backup file: ${file} (age: ${Math.floor(days)} days) (date: ${date.toISOString().split('T')[0]})`);
-            // uncomment the next line to actually delete the files
-            // fs.unlinkSync(`/backup/${file}`);
+            unlinkSync(`${path}/${file}`);
         }
     }
 }

@@ -1,0 +1,44 @@
+{
+  "name": "iobroker.type-detector",
+  "version": "4.6.0",
+  "description": "Detects devices in ioBroker for Material, Google home, Homekit, ...",
+  "author": {
+    "name": "bluefox",
+    "email": "dogafox@gmail.com"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://github.com/ioBroker/ioBroker.type-detector",
+  "keywords": [
+    "ioBroker",
+    "types",
+    "devices"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ioBroker/ioBroker.type-detector"
+  },
+  "dependencies": {},
+  "devDependencies": {
+      "@types/node": "^24.9.1",
+    "@iobroker/eslint-config": "^2.2.0",
+    "typescript": "~5.9.3"
+  },
+  "bugs": {
+    "url": "https://github.com/ioBroker/ioBroker.type-detector/issues"
+  },
+  "main": "index.js",
+  "files": [
+    "LICENSE",
+    "*.js",
+    "*.d.ts",
+    "*.js.map"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "npm": "npm i -f"
+  },
+  "license": "MIT",
+  "readmeFilename": "README.md"
+}

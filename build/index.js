@@ -14,15 +14,15 @@ function getDate(name) {
     return null;
 }
 const list = (0, node_fs_1.readdirSync)('/backup');
+const now = new Date();
 // delete all backups oder than 30 days
 for (const file of list) {
     const date = getDate(file);
     if (date) {
-        const now = new Date();
         const diff = now.getTime() - date.getTime();
         const days = diff / (1000 * 60 * 60 * 24);
         if (days > 30) {
-            console.log(`Deleting backup file: ${file}`);
+            console.log(`Deleting backup file: ${file} (age: ${Math.floor(days)} days) (date: ${date.toISOString().split('T')[0]})`);
             // uncomment the next line to actually delete the files
             // fs.unlinkSync(`/backup/${file}`);
         }

@@ -1,0 +1,5 @@
+{
+    "maxSize": "500GB",
+    "directory": "/backup",
+    "dryRun": false
+}

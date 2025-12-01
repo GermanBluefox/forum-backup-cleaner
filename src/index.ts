@@ -6,6 +6,7 @@ const config = _config as {
     maxSize?: string | number;
     maxDays?: number;
     dryRun?: boolean;
+    patterns?: string[];
 };
 let path = config.directory || '/backup';
 if (path.endsWith('/')) {
@@ -41,13 +42,11 @@ function getDate(name: string): Date | null {
     return null;
 }
 
-const list = readdirSync(path);
+let list = readdirSync(path);
 list.sort();
-list.reverse();
-
 const now = new Date();
+
 // delete all backups oder than 30 days
-let size = 0;
 for (let i = list.length - 1; i >= 0; i--) {
     const file = list[i];
     const date = getDate(file);
@@ -61,14 +60,60 @@ for (let i = list.length - 1; i >= 0; i--) {
             }
         }
     }
-    const stat = lstatSync(`${path}/${file}`);
-    size += Math.round(stat.size / (1024 * 1024));
-    let deleteFollowing = false;
-    if (config.maxSize && (deleteFollowing || size > (config.maxSize as number))) {
-        console.log(`Deleting backup file: ${file} (total size exceeded: ${Math.round(size / (1024 * 1024))} MB)`);
-        if (!config.dryRun) {
-            unlinkSync(`${path}/${file}`);
+}
+function getDirSizeMB(path: string): number {
+    let totalSize = 0;
+    const files = readdirSync(path);
+    for (const file of files) {
+        const stat = lstatSync(`${path}/${file}`);
+        totalSize += Math.round(stat.size / (1024 * 1024));
+    }
+    return totalSize;
+}
+
+list = readdirSync(path);
+list.sort();
+let size = 0;
+
+if (config.patterns) {
+    const regs = config.patterns.map(pattern => new RegExp(pattern.replace(/\./g, '\\.').replace(/\*/g, '.*')));
+    for (let i = 0; i < list.length; i++) {
+        if (getDirSizeMB(path) <= (config.maxSize as number)) {
+            break;
         }
-        deleteFollowing = true;
+        const file = list[i];
+        if (!regs[0].test(file)) {
+            continue;
+        }
+        // extract date from file name: mongo-25-11-18.gz
+        let date = file.match(/\d\d-\d\d-\d\d/);
+        // Find all files with this date
+        if (date) {
+            const dateStr = date[0];
+            const filesToDelete = list.filter(f => f.includes(dateStr));
+            for (const f of filesToDelete) {
+                const stat = lstatSync(`${path}/${f}`);
+                const fileSize = Math.round(stat.size / (1024 * 1024)); // convert to megabytes
+                console.log(`Deleting backup file: ${f} (total size exceeded: ${fileSize} MB)`);
+                // Delete all files with this date
+                if (!config.dryRun) {
+                    unlinkSync(`${path}/${f}`);
+                }
+            }
+        }
+    }
+} else {
+    for (let i = list.length - 1; i >= 0; i--) {
+        const file = list[i];
+        const stat = lstatSync(`${path}/${file}`);
+        size += Math.round(stat.size / (1024 * 1024));
+        let deleteFollowing = false;
+        if (config.maxSize && (deleteFollowing || size > (config.maxSize as number))) {
+            console.log(`Deleting backup file: ${file} (total size exceeded: ${size} MB)`);
+            if (!config.dryRun) {
+                unlinkSync(`${path}/${file}`);
+            }
+            deleteFollowing = true;
+        }
     }
 }

@@ -1,5 +1,6 @@
 {
     "maxSize": "500GB",
     "directory": "/backup",
-    "dryRun": false
+    "dryRun": false,
+    "patterns": ["mongo-*.gz", "nodebb-*.tar.gz"]
 }
